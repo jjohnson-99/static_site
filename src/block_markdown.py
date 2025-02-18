@@ -8,13 +8,14 @@ def markdown_to_blocks(markdown):
 def block_to_block_type(markdown_block):
     max_num_headers = 6
     headings = ['#'*i + ' ' for i in range(1,max_num_headers+1)]
-    for i in range(1, min(max_num_headers+1, len(markdown_block)+1)):
+    for i in range(1, min(max_num_headers+2, len(markdown_block)+1)):
         if markdown_block[0:i] in headings:
             return "heading"
 
     if len(markdown_block) >= 6 and markdown_block[0:3] == '```' and markdown_block[-3:] == '```':
         return "code"
     
+    markdown_block = markdown_block.strip()
     lines = markdown_block.split('\n')
     if all([line[0] == '>' for line in lines]):
         return "quote"
@@ -25,11 +26,11 @@ def block_to_block_type(markdown_block):
     else:
         return "paragraph"
 
-def block_tag(block):
-    block_type = block_to_block_type(block)
+def block_tag(text):
+    block_type = block_to_block_type(text)
     if block_type == "heading":
         i = 0
-        while block[i] == '#':
+        while text[i] == '#':
             i += 1
         return f"h{i}"
     if block_type == "code":
@@ -44,6 +45,7 @@ def block_tag(block):
         return "p"
 
 def separate_list_items(text):
+    text = text.strip()
     return [line.split(' ',1)[1] for line in text.split('\n')]
  
 def trim_markdown_type_indicator(text):
@@ -51,20 +53,20 @@ def trim_markdown_type_indicator(text):
     if block_type == "heading":
         return text.split(' ',1)[1]
     if block_type == "code":
-        return text[3:-3]
+        return text[2:-2]
     if block_type == "paragraph":
         return text
     if block_type == "quote":
-        return '\n'.join([line[1:] for line in text.split('\n')])
+        return '\n'.join([line[1:] for line in text.split('\n')]).rstrip()
     else:
         return text
 
 def text_to_children(text):
     trimmed_text = trim_markdown_type_indicator(text)
-    child_textnodes = text_to_textnodes(text)
+    child_textnodes = text_to_textnodes(trimmed_text)
     child_htmlnodes = []
     for child in child_textnodes:
-        child_htmlnodess.append(text_node_to_html_node(child))
+        child_htmlnodes.append(text_node_to_html_node(child))
 
     return child_htmlnodes
  
@@ -74,7 +76,7 @@ def block_to_parentnode(text):
 def helper_list_items(text):
     child_htmlnodes = []
     for line in separate_list_items(text):
-        child_htmlnodes.append(ParentNode("li"), text_to_children(line))
+        child_htmlnodes.append(ParentNode("li", text_to_children(line)))
 
     return child_htmlnodes
 

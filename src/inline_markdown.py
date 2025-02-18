@@ -102,17 +102,3 @@ def block_to_block_type(markdown_block):
         return "ordered_list"
     else:
         return "paragraph"
-
-'''
-def text_to_children(text):
-    # takes a block and returns a list of HTMLNodes
-
-
-def markdown_to_html_node(markdown):
-    # split markdown into blocks, 
-    # ie ["# this is a heading", "with just normal text", "* and a list\n * item 2"]
-
-    # we have a list of blocks, which are just text
-    # now we go through the text and record its type, ie, heading, ol, ul, code, paragraph..
-    # now take the block and its type to create an HTMLNode
-   '''                                   
